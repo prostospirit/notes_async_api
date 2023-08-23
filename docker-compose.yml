@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+
+  web:
+    build: ./project
+    command: /usr/src/app/docker-entrypoint.sh
+    volumes:
+      - ./project:/usr/src/app
+    ports:
+      - 8004:8000
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/notes_db
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15.3
+    ports:
+      - "5450:5432"
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=notes_db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      
+volumes:
+  pg_data:
